@@ -14,4 +14,4 @@ spec:
     spec:
       containers:
         - name: hashresponse
-          image: tapanih/dwk-app2:0.0.1
+          image: tapanih/dwk-app2:0.0.2
