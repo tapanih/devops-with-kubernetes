@@ -1,17 +1,17 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: hashgenerator-dep
+  name: main-application-dep
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: hashgenerator
+      app: main-application
   template:
     metadata:
       labels:
-        app: hashgenerator
+        app: main-application
     spec:
       containers:
-        - name: hashgenerator
-          image: tapanih/dwk-app1:0.0.1
+        - name: main-application
+          image: tapanih/dwk-app1:0.0.2

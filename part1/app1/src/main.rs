@@ -1,11 +1,20 @@
-use std::{thread, time};
+#![feature(proc_macro_hygiene, decl_macro)]
+
+#[macro_use] extern crate rocket;
+#[macro_use] extern crate lazy_static;
+
 use chrono::prelude::{Utc};
 use uuid::Uuid;
 
+lazy_static! {
+    static ref UUID: Uuid = Uuid::new_v4();
+}
+
+#[get("/")]
+fn index() -> String {
+    format!("{}: {}", Utc::now(), *UUID)
+}
+
 fn main() {
-    let my_uuid = Uuid::new_v4();
-    loop { 
-        println!("{}: {}", Utc::now(), my_uuid);
-        thread::sleep(time::Duration::from_secs(5));
-    }
+    rocket::ignite().mount("/", routes![index]).launch();
 }

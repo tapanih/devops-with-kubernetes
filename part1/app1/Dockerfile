@@ -1,8 +1,8 @@
-FROM rust:1.48-alpine3.11 as builder
+FROM ekidd/rust-musl-builder:nightly-2020-11-19 as builder
 WORKDIR /usr/src/app1
 COPY . .
-RUN cargo install --path .
+RUN sudo chown -R rust:rust . && cargo install --path .
 
-FROM alpine:3.11
-COPY --from=builder /usr/local/cargo/bin/app1 /usr/local/bin/app1
+FROM alpine:3.12
+COPY --from=builder /home/rust/.cargo/bin/app1 /usr/local/bin/app1
 CMD ["app1"]
