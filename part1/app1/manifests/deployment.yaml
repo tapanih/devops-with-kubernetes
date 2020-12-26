@@ -12,6 +12,18 @@ spec:
       labels:
         app: main-application
     spec:
+      volumes:
+        - name: shared-timestamp
+          emptyDir: {}
       containers:
-        - name: main-application
-          image: tapanih/dwk-app1:0.0.2
+        - name: app-response
+          image: tapanih/dwk-app-response:0.1
+          volumeMounts:
+          - name: shared-timestamp
+            mountPath: /usr/local/bin/files
+        - name: timestamper
+          image: tapanih/dwk-timestamper:0.1
+          volumeMounts:
+          - name: shared-timestamp
+            mountPath: /usr/local/bin/files
+

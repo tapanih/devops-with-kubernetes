@@ -1,5 +1,5 @@
 [package]
-name = "app1"
+name = "timestamper"
 version = "0.1.0"
 authors = ["Tapani Honkanen <tapani.honkanen@hotmail.com>"]
 edition = "2018"
@@ -8,6 +8,3 @@ edition = "2018"
 
 [dependencies]
 chrono = "0.4"
-uuid = { version = "0.4", features = ["v4"] }
-rocket = "0.4.6"
-lazy_static = "1.4.0"
