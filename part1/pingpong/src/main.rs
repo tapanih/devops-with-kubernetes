@@ -4,12 +4,20 @@
 
 use std::sync::atomic::{AtomicUsize, Ordering};
 use rocket::State;
+use std::env;
+use std::fs;
 
 struct Counter(AtomicUsize);
 
 #[get("/")]
 fn index(counter: State<Counter>) -> String {
     let count = counter.0.fetch_add(1, Ordering::Relaxed);
+    let filename = env::var("PINGPONG_FILE")
+        .expect("PINGPONG_FILE not found");
+    fs::write(&filename, count.to_string())
+        .unwrap_or_else(|_| {
+            println!("Could not write to file.");
+        });
     format!("pong {}", count.to_string())
 }
 

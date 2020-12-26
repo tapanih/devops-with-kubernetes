@@ -1,6 +1,6 @@
 [package]
-name = "app2"
-version = "0.0.2"
+name = "pingpong"
+version = "0.2.0"
 authors = ["Tapani Honkanen <tapani.honkanen@hotmail.com>"]
 edition = "2018"
 

@@ -15,12 +15,17 @@ spec:
       volumes:
         - name: shared-timestamp
           emptyDir: {}
+        - name: shared-pingpong
+          persistentVolumeClaim:
+            claimName: pingpong-claim
       containers:
         - name: app-response
-          image: tapanih/dwk-app-response:0.1
+          image: tapanih/dwk-app-response:0.3
           volumeMounts:
           - name: shared-timestamp
             mountPath: /usr/local/bin/files
+          - name: shared-pingpong
+            mountPath: /usr/local/bin/pongs
         - name: timestamper
           image: tapanih/dwk-timestamper:0.1
           volumeMounts:
