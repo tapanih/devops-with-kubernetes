@@ -5,4 +5,6 @@ RUN sudo chown -R rust:rust . && cargo install --path .
 
 FROM alpine:3.12
 COPY --from=builder /home/rust/.cargo/bin/todo-app /usr/local/bin/todo-app
+RUN mkdir /usr/local/bin/images
+ENV IMAGE_FILE=/usr/local/bin/images/daily.jpeg
 CMD ["todo-app"]

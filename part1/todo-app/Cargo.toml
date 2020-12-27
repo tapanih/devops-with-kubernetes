@@ -1,6 +1,6 @@
 [package]
 name = "todo-app"
-version = "0.0.2"
+version = "0.1.0"
 authors = ["Tapani Honkanen <tapani.honkanen@hotmail.com>"]
 edition = "2018"
 
@@ -8,3 +8,6 @@ edition = "2018"
 
 [dependencies]
 rocket = "0.4.6"
+lazy_static = "1.4.0"
+reqwest = { version = "0.10", features = ["blocking"] }
+bytes = "0.5.6"
