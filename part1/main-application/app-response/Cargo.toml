@@ -1,6 +1,6 @@
 [package]
 name = "app-response"
-version = "0.3.0"
+version = "0.6.0"
 authors = ["Tapani Honkanen <tapani.honkanen@hotmail.com>"]
 edition = "2018"
 
@@ -8,3 +8,4 @@ edition = "2018"
 uuid = { version = "0.4", features = ["v4"] }
 rocket = "0.4.6"
 lazy_static = "1.4.0"
+reqwest = { version = "0.10", features = ["blocking"] }

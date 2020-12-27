@@ -7,6 +7,7 @@ spec:
   selector:
     app: pingpong
   ports:
-    - port: 2347
+    - name: http
+      port: 2347
       protocol: TCP
       targetPort: 8000

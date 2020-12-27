@@ -20,7 +20,10 @@ spec:
             claimName: pingpong-claim
       containers:
         - name: app-response
-          image: tapanih/dwk-app-response:0.3
+          image: tapanih/dwk-app-response:0.6
+          env:
+            - name: PINGPONG_URL
+              value: http://pingpong-svc:2347/pongs
           volumeMounts:
           - name: shared-timestamp
             mountPath: /usr/local/bin/files

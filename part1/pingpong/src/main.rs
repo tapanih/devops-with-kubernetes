@@ -9,7 +9,12 @@ use std::fs;
 
 struct Counter(AtomicUsize);
 
-#[get("/")]
+#[get("/pongs")]
+fn pong(counter: State<Counter>) -> String {
+    format!("{}", counter.0.load(Ordering::Relaxed))
+}
+
+#[get("/pingpong")]
 fn index(counter: State<Counter>) -> String {
     let count = counter.0.fetch_add(1, Ordering::Relaxed);
     let filename = env::var("PINGPONG_FILE")
@@ -23,6 +28,6 @@ fn index(counter: State<Counter>) -> String {
 
 fn main() {
     rocket::ignite()
-      .mount("/", routes![index])
+      .mount("/", routes![index, pong])
       .manage(Counter(AtomicUsize::new(0))).launch();
 }

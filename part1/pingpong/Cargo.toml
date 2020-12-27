@@ -1,6 +1,6 @@
 [package]
 name = "pingpong"
-version = "0.2.0"
+version = "0.5.0"
 authors = ["Tapani Honkanen <tapani.honkanen@hotmail.com>"]
 edition = "2018"
 
