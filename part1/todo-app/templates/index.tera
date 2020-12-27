@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html style="height: 100%;">
+  <body style="height: 100%;">
+    <img src="/daily" alt="Daily image" style="height:80%;">
+    <form>
+      <input type="text" name="newtodo" maxlength=140>
+      <input type="submit" value="Create TODO">
+    </form>
+    <ul>
+      {% for todo in todos %}
+        <li>{{ todo }}</li>
+      {% endfor %}
+    </ul>
+  </body>
+</html>
+

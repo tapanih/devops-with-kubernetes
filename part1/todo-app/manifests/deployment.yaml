@@ -17,7 +17,7 @@ spec:
           emptyDir: {}
       containers:
         - name: todo-app
-          image: tapanih/dwk-todo-app:0.1
+          image: tapanih/dwk-todo-app:0.2
           volumeMounts:
           - name: image-cache
-            mountPath: /usr/local/bin/images
+            mountPath: /images

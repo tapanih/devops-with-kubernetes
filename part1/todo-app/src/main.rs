@@ -9,6 +9,7 @@ use rocket::response::status::NotFound;
 use rocket::response::NamedFile;
 use rocket::State;
 use std::env;
+use rocket_contrib::templates::Template;
 
 const DAY_IN_SECONDS: u64 = 86400;
 
@@ -20,7 +21,7 @@ lazy_static! {
 struct DaysSinceEpoch(AtomicU64);
 
 fn get_new_image() -> Result<bytes::Bytes, String> {
-    let response = reqwest::blocking::get("https://picsum.photos/1200");
+    let response = reqwest::blocking::get("http://picsum.photos/1200");
     return match response {
         Err(_)   => return Err("Could not get image".to_string()),
         Ok(resp) => match resp.bytes() {
@@ -30,8 +31,19 @@ fn get_new_image() -> Result<bytes::Bytes, String> {
     };
 }
 
+#[derive(serde::Serialize)]
+struct Context {
+    todos: &'static [&'static str]
+}
+
 #[get("/")]
-fn index(state: State<DaysSinceEpoch>) -> Result<NamedFile, NotFound<String>> {
+fn index() -> Template {
+    let context = Context{ todos: &["todo1", "another todo"]};
+    Template::render("index", context)
+}
+
+#[get("/daily")]
+fn daily(state: State<DaysSinceEpoch>) -> Result<NamedFile, NotFound<String>> {
     let old_days_since_epoch = state.0.load(Ordering::Relaxed);
     let new_days_since_epoch = SystemTime::now()
         .duration_since(SystemTime::UNIX_EPOCH).unwrap().as_secs() / DAY_IN_SECONDS;
@@ -49,12 +61,13 @@ fn index(state: State<DaysSinceEpoch>) -> Result<NamedFile, NotFound<String>> {
 }
 
 fn main() {
-    let bytes = get_new_image().expect("Error: ");
+    let bytes = get_new_image().expect("Error");
     std::fs::write(&IMAGE_FILE[..], bytes).expect("Could not write to file.");
     let days_since_epoch = AtomicU64::new(
         SystemTime::now().duration_since(SystemTime::UNIX_EPOCH).unwrap().as_secs() / DAY_IN_SECONDS
     );
     rocket::ignite()
         .manage(DaysSinceEpoch(days_since_epoch))
-        .mount("/", routes![index]).launch();
+        .attach(Template::fairing())
+        .mount("/", routes![index, daily]).launch();
 }

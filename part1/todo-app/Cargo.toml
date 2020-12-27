@@ -1,6 +1,6 @@
 [package]
 name = "todo-app"
-version = "0.1.0"
+version = "0.2.0"
 authors = ["Tapani Honkanen <tapani.honkanen@hotmail.com>"]
 edition = "2018"
 
@@ -11,3 +11,9 @@ rocket = "0.4.6"
 lazy_static = "1.4.0"
 reqwest = { version = "0.10", features = ["blocking"] }
 bytes = "0.5.6"
+serde = { version = "1.0", features = ["derive"] }
+
+[dependencies.rocket_contrib]
+version = "0.4.6"
+default-features = false
+features = ["tera_templates"]
