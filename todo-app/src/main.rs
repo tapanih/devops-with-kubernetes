@@ -16,6 +16,10 @@ const DAY_IN_SECONDS: u64 = 86400;
 lazy_static! {
     static ref IMAGE_FILE: String = env::var("IMAGE_FILE")
         .expect("IMAGE_FILE not found");
+    static ref TODO_SERVICE_URL: String = env::var("TODO_SERVICE_URL")
+        .expect("TODO_SERVICE_URL not found");
+    static ref TODO_POST_URL: String = env::var("TODO_POST_URL")
+        .expect("TODO_POST_URL not found");
 }
 
 struct DaysSinceEpoch(AtomicU64);
@@ -31,15 +35,42 @@ fn get_new_image() -> Result<bytes::Bytes, String> {
     };
 }
 
-#[derive(serde::Serialize)]
-struct Context {
-    todos: &'static [&'static str]
+#[derive(Clone, serde::Serialize, serde::Deserialize)]
+pub struct Todo {
+    pub content: String,
+}
+
+#[derive(Clone, serde::Serialize, serde::Deserialize)]
+pub struct Context {
+    todo_post_url: &'static str,
+    todos: Vec<Todo>
+}
+
+#[derive(Clone, serde::Serialize, serde::Deserialize)]
+pub struct Todos {
+    todos: Vec<Todo>
+}
+
+impl Todo {
+    pub fn new(content: String) -> Todo {
+        Todo { content }
+    }
 }
 
 #[get("/")]
 fn index() -> Template {
-    let context = Context{ todos: &["todo1", "another todo"]};
-    Template::render("index", context)
+    let todos: Todos = match reqwest::blocking::get(&TODO_SERVICE_URL[..]) {
+        Err(_) => {
+            println!("Error: could not fetch todos from the service");
+            Todos{ todos: Vec::new() }
+        },
+        Ok(response) => response.json().unwrap_or_else(|_| {
+            println!("Error: could not parse json");
+            Todos{ todos: Vec::new() }
+        })
+    };
+
+    Template::render("index", Context { todos: todos.todos, todo_post_url: &TODO_POST_URL[..] })
 }
 
 #[get("/daily")]
