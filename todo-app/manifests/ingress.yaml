@@ -10,3 +10,7 @@ spec:
         backend:
           serviceName: todo-app-svc
           servicePort: 2346
+      - path: /todos
+        backend:
+          serviceName: todo-service-svc
+          servicePort: 2348

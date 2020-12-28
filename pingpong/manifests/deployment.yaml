@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: pingpong-dep
+  namespace: alpha
 spec:
   replicas: 1
   selector:
@@ -12,13 +13,6 @@ spec:
       labels:
         app: pingpong
     spec:
-      volumes:
-        - name: shared-pingpong
-          persistentVolumeClaim:
-            claimName: pingpong-claim
       containers:
         - name: pingpong
           image: tapanih/dwk-pingpong:0.5
-          volumeMounts:
-          - name: shared-pingpong
-            mountPath: /usr/local/bin/pongs
