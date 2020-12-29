@@ -1,6 +1,6 @@
 [package]
 name = "app-response"
-version = "0.6.0"
+version = "0.7.0"
 authors = ["Tapani Honkanen <tapani.honkanen@hotmail.com>"]
 edition = "2018"
 

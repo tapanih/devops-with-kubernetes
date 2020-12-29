@@ -13,6 +13,8 @@ lazy_static! {
         .expect("TIMESTAMP_FILE not found");
     static ref PINGPONG_URL: String = env::var("PINGPONG_URL")
         .expect("PINGPONG_URL not found");
+    static ref MESSAGE: String = env::var("MESSAGE")
+        .expect("MESSAGE not found");
 }
 
 #[get("/main")]
@@ -22,7 +24,7 @@ fn index() -> String {
         Err(_)       => "0".to_string()
     };
     let timestamp = fs::read_to_string(&TIMESTAMP_FILE[..]).unwrap_or("".to_string());
-    format!("{}: {}\nPing / Pongs: {}", timestamp.trim(), *UUID, pongs.trim())
+    format!("{}\n{}: {}\nPing / Pongs: {}", *MESSAGE, timestamp.trim(), *UUID, pongs.trim())
 }
 
 fn main() {

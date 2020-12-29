@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: main-application-config
+  namespace: alpha
+data:
+  message: Hello
