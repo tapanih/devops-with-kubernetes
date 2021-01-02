@@ -15,4 +15,10 @@ spec:
     spec:
       containers:
         - name: pingpong
-          image: tapanih/dwk-pingpong:0.5
+          image: tapanih/dwk-pingpong:0.6
+          env:
+          - name: POSTGRES_URL
+            valueFrom:
+              secretKeyRef:
+                name: postgres-secret
+                key: POSTGRES_URL
