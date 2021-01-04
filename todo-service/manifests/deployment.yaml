@@ -18,7 +18,13 @@ spec:
           emptyDir: {}
       containers:
         - name: todo-service
-          image: tapanih/dwk-todo-service:0.3
+          image: tapanih/dwk-todo-service:0.4
+          env:
+          - name: POSTGRES_URL
+            valueFrom:
+              secretKeyRef:
+                name: postgres-secret
+                key: POSTGRES_URL
           volumeMounts:
           - name: image-cache
             mountPath: /images

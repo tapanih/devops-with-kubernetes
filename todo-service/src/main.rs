@@ -5,13 +5,15 @@
 
 use rocket::response::Redirect;
 use rocket::request::Form;
-use rocket::State;
 use rocket_contrib::json::Json;
-use std::sync::{Arc, Mutex};
+use rocket::response::status::BadRequest;
+use postgres::{Client, NoTls};
 
 lazy_static! {
     static ref REDIRECT_URL: String = std::env::var("REDIRECT_URL")
         .expect("REDIRECT_URL not found");
+    static ref POSTGRES_URL: String = std::env::var("POSTGRES_URL")
+        .expect("POSTGRES_URL not found");
 }
 
 #[derive(Clone, serde::Serialize, serde::Deserialize)]
@@ -25,21 +27,6 @@ impl Todo {
     }
 }
 
-pub struct StateTodos {
-    pub todos: Arc<Mutex<Vec<Todo>>>,
-}
-
-impl StateTodos {
-    pub fn new() -> StateTodos {
-        let todos = Arc::new(Mutex::new(vec![
-            Todo::new(String::from("Todo 1")),
-            Todo::new(String::from("Another todo")),
-        ]));
-
-        StateTodos { todos }
-    }
-}
-
 #[derive(serde::Serialize)]
 pub struct Todos {
     pub todos: Vec<Todo>,
@@ -50,26 +37,54 @@ struct UserInput {
     content: String
 }
 
+fn get_db_connection() -> Client {
+    return Client::connect(&POSTGRES_URL[..], NoTls)
+        .expect("could not connect to database");
+}
+
+fn get_todos_from_db(client: &mut Client) -> Vec<Todo> {
+    return client.query("SELECT content FROM todos", &[]).unwrap()
+        .into_iter().map(|row| Todo { content: row.get(0) }).collect::<Vec<Todo>>();
+}
+
+fn initialize_database() {
+    let mut client = get_db_connection();
+    client.batch_execute("CREATE TABLE IF NOT EXISTS todos ( content VARCHAR(140) );").unwrap();
+}
+
 #[post("/todos", format= "application/x-www-form-urlencoded", data = "<user_input>")]
-fn post_todos_form(user_input: Form<UserInput>, state: State<StateTodos>) -> Redirect {
-    Arc::clone(&state.todos).lock().unwrap().push(Todo { content: user_input.content.clone() });
+fn post_todos_form(user_input: Form<UserInput>) -> Redirect {
+    let mut client = get_db_connection();
+    match client.execute("INSERT INTO todos VALUES ($1)", &[&user_input.content]) {
+        Ok(_) => println!("Todo added"),
+        Err(_) => println!("Invalid todo"),
+    }
     Redirect::to(&REDIRECT_URL[..])
 }
 
 #[post("/todos", format= "application/json", data= "<todo>")]
-fn post_todos(todo: Json<Todo>, state: State<StateTodos>) -> &'static str {
-    Arc::clone(&state.todos).lock().unwrap().push(todo.into_inner());
-    "Todo added"
+fn post_todos(todo: Json<Todo>) -> Result<&'static str, BadRequest<&'static str>> {
+    let mut client = get_db_connection();
+    match client.execute("INSERT INTO todos VALUES ($1)", &[&todo.into_inner().content]) {
+        Ok(_)  => {
+            println!("Todo added");
+            Ok("Todo added")
+        }
+        Err(_) => {
+            println!("Invalid todo");
+            Err(BadRequest(Some("Invalid todo")))
+        }
+    }
 }
 
 #[get("/todos")]
-pub fn get_todos<'a>(state: State<'a, StateTodos>) -> Json<Todos> {
-    Json(Todos { todos: Arc::clone(&state.inner().todos).lock().unwrap().to_vec() })
+pub fn get_todos() -> Json<Todos> {
+    Json(Todos { todos: get_todos_from_db(&mut get_db_connection()) })
 }
 
 fn main() {
+    initialize_database();
     rocket::ignite()
-        .manage(StateTodos::new())
         .mount("/", routes![get_todos, post_todos, post_todos_form])
         .launch();
 }
