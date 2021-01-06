@@ -1,0 +1,18 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: daily-todo-job
+  namespace: beta
+spec:
+  schedule: "0 0 * * *" # run once a day at midnight
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: daily-todo
+            image: tapanih/dwk-daily-todo:0.1
+            env:
+            - name: TODO_POST_URL
+              value: http://todo-service-svc:2348/todos
+          restartPolicy: OnFailure
